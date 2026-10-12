@@ -1,11 +1,12 @@
 import pygame, sys, random
 from collections import defaultdict
 from math import dist, sqrt
+from pygame import gfxdraw
 
 pygame.init()
 pygame.font.init()
 
-width, height = 1000, 800
+width, height = 2000, 1400
 screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Particle Simulation")
 
@@ -13,8 +14,8 @@ FONT = pygame.font.SysFont("Consolas", 14)
 
 clock = pygame.time.Clock()
 
-max_radius = 10
-min_radius = 10
+max_radius = 15
+min_radius = 15
 cell_size = 2 * max_radius
 bounce_factor = 0.0
 border_radius = min(width, height) * 0.9 // 2
@@ -39,10 +40,10 @@ class vector:
         self.x = x
         self.y = y
 
-    def add(self, other: vector):
+    def add(self, other: 'vector'):
         return vector(self.x + other.x, self.y + other.y)
 
-    def subtract(self, other: vector):
+    def subtract(self, other: 'vector'):
         return vector(self.x - other.x, self.y - other.y)
 
     def multiply(self, scalar: float):
@@ -60,7 +61,7 @@ class vector:
             return vector(0, 0)
         return self.divide(mag)
     
-    def dist(self, other: vector):
+    def dist(self, other: 'vector'):
         return sqrt((self.x - other.x) ** 2 + (self.y - other.y) ** 2)
 
 class Particle:
@@ -70,7 +71,7 @@ class Particle:
         self.old_cords = vector(x, y)
         self.radius = radius
         self.color = color
-        #self.color = (255, 255, 255)
+        self.color = (255, 255, 255)
         #self.radius = 10
         self.velocity = vector(0, 0)
         self.acseleration = vector(0, 150)
@@ -86,9 +87,9 @@ class Particle:
         #self.updateArr()
     
     def render(self, surface: pygame.Surface):
-        pygame.draw.aacircle(surface, self.color, (int(self.x), int(self.y)), self.radius)
+        gfxdraw.filled_circle(surface, int(self.x), int(self.y), self.radius, self.color)
         
-    def solveCollision(self, other: Particle):
+    def solveCollision(self, other: 'Particle'):
         distance = dist((self.x, self.y), (other.x, other.y))
         if distance == 0 or distance < 0.01: return
         if distance < self.radius + other.radius:
@@ -175,8 +176,8 @@ def update_grid():
         
 
 if __name__ == "__main__":
-    n = 1150
-    delay = 0.001
+    n = 10
+    delay = 0.1
     timer = 0
     mouse_button = False
     k=0
@@ -202,7 +203,7 @@ if __name__ == "__main__":
             k+=1
             timer = 0
         if n!=0 and timer > delay:
-            for i in range(50):
+            for i in range(10):
                 pos = vector(random.randint(width//2-0+i*5, width//2 + 1+i*5), height//2)
                 radius = random.randint(min_radius, max_radius)
                 color = pygame.Color(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
@@ -218,7 +219,7 @@ if __name__ == "__main__":
             
         
         screen.fill((150, 150, 150))
-        pygame.draw.aacircle(screen, (0, 0, 0), (width // 2, height // 2), border_radius)
+        gfxdraw.filled_circle(screen, int(width // 2), int(height // 2), int(border_radius), (0, 0, 0))
         
         title = FONT.render(str(k), True, (0, 0, 0))
         screen.blit(title, (45, 15))
